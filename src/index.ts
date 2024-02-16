@@ -1,9 +1,9 @@
-import child from "child_process";
-import fsPromises from "fsPromises";
-import fs from "fs";
-import path from "path";
 import vtt from "@plussub/srt-vtt-parser";
-import util from "util";
+import child from "node:child_process";
+import fs from "node:fs";
+import fsPromises from "fs/promises";
+import path from "node:path";
+import util from "node:util";
 
 const exec = util.promisify(child.exec);
 
@@ -19,7 +19,22 @@ for (const folder of REQUIRED_FOLDERS) {
 }
 
 const VOICE = `en-US-AvaNeural`;
-const SCRIPT = `When a jellyfish stings you, it lodges microscopic barbs into your skin. Their tentacles are armed with thousands of them, and they're each filled with venom. Now, even if you just lightly brush against them, the stingers will immediately embed into your skin and release their painful toxins. The sting can cause an immediate sharp pain and may turn swollen and itchy as the venom spreads.`;
+const SCRIPT = `Fuck nooooo.Weird facts you don't know. 
+A swarm of 20,000 bees followed a car for two days because their queen was stuck inside.
+Rockados cannot stick their tongue out because it's attached to the roof of their mouths. 
+
+If you tickle a rat day after day, it will start laughing whenever it sees you. 
+
+In 2013, police and the Maldives arrested a coconut for lordering near a polling station for the presidential election.
+Locals fear the coconut may have been ingrained with a black magic spell to influence the election. 
+
+A Chinese farmer who always wanted to own his own plane built a full scale,
+non-working replica of an airbus A320 out of 50 tons of steel. It took him and his friends over two years and costed over $400,000. 
+
+When invited by a lady to spend a night with her, Benjamin Franklin asked to postpone until winter when nights were longer.`.replace(
+  /\r\n|\n|\r/g,
+  ""
+);
 const FILE_AUDIO = `script.mp3`;
 const FILE_SUB_VTT = `script.vtt`;
 const FILE_SUB_JSON = `script.json`;
@@ -28,9 +43,20 @@ const PATH_AUDIO = path.join(FOLDER_TEMP, FILE_AUDIO);
 const PATH_SUB_VTT = path.join(FOLDER_TEMP, FILE_SUB_VTT);
 const PATH_SUB_JSON = path.join(FOLDER_TEMP, FILE_SUB_JSON);
 
-await exec(
-  `edge-tts -v ${VOICE} -t "${SCRIPT}" --write-media ${PATH_AUDIO} --write-subtitles ${PATH_SUB_VTT}`
-);
+console.log({
+  VOICE,
+  PATH_AUDIO,
+});
+
+try {
+  await exec(
+    `edge-tts -v ${VOICE} -t "${SCRIPT}" --write-media ${PATH_AUDIO} --write-subtitles ${PATH_SUB_VTT}`
+  );
+} catch (error) {
+  console.log(error);
+}
+
+console.log("Done. Saving subtitles...");
 
 const subtitleString = await fsPromises
   .readFile(PATH_SUB_VTT)
@@ -47,3 +73,5 @@ await fsPromises.writeFile(
   PATH_SUB_JSON,
   JSON.stringify({ subtitles: transformedSub })
 );
+
+console.log((await fsPromises.readFile(PATH_SUB_JSON)).toString());
