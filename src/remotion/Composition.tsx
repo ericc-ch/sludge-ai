@@ -1,7 +1,18 @@
-import { AbsoluteFill, OffthreadVideo, staticFile } from "remotion";
+import {
+  AbsoluteFill,
+  Audio,
+  OffthreadVideo,
+  Series,
+  staticFile,
+  useCurrentFrame,
+} from "remotion";
+import { SUBTITLES } from "./assets/subtitles";
 import { Text } from "./components/Text";
+import { msToFrames } from "./lib/time";
 
 export const MyComposition = () => {
+  const frame = useCurrentFrame();
+
   return (
     <AbsoluteFill>
       <AbsoluteFill>
@@ -18,9 +29,20 @@ export const MyComposition = () => {
         />
       </AbsoluteFill>
 
-      <AbsoluteFill>
-        <Text style={{ fontSize: 100 }}>Wow what's that bro</Text>
-      </AbsoluteFill>
+      <Series>
+        {SUBTITLES.map((sub, index) => (
+          <Series.Sequence
+            key={index}
+            durationInFrames={msToFrames(sub.to - sub.from)}
+          >
+            <AbsoluteFill>
+              <Text style={{ fontSize: 100 }}>{sub.text}</Text>
+            </AbsoluteFill>
+          </Series.Sequence>
+        ))}
+      </Series>
+
+      <Audio volume={1} src={staticFile("script.mp3")} />
     </AbsoluteFill>
   );
 };
