@@ -1,16 +1,15 @@
 import vtt from "@plussub/srt-vtt-parser";
+import fsPromises from "node:fs/promises";
 import child from "node:child_process";
 import fs from "node:fs";
-import fsPromises from "fs/promises";
 import path from "node:path";
 import util from "node:util";
 
 const exec = util.promisify(child.exec);
 
-const FOLDER_TEMP = path.join(process.cwd(), "temp");
 const FOLDER_PUBLIC = path.join(process.cwd(), "public");
 
-const REQUIRED_FOLDERS = [FOLDER_TEMP, FOLDER_PUBLIC];
+const REQUIRED_FOLDERS = [FOLDER_PUBLIC, FOLDER_PUBLIC];
 
 for (const folder of REQUIRED_FOLDERS) {
   if (!fs.existsSync(folder)) {
@@ -18,35 +17,21 @@ for (const folder of REQUIRED_FOLDERS) {
   }
 }
 
+const removeNewLines = (str: string) => {
+  return str.replace(/\r\n|\n|\r/g, " ");
+};
+
+const SCRIPT = removeNewLines(`Geography facts you don't know. The world's smallest country is Vatican City, which is only 0.44 square kilometers. The largest ocean in the world is the Pacific Ocean, which covers about 60% of the Earth's surface. The deepest lake in the world is Lake Baikal, which is over 1,600 meters deep. The longest river in the world is the Nile River, which is over 6,600 kilometers long.`);
+
 const VOICE = `en-US-AvaNeural`;
-const SCRIPT = `Fuck nooooo.Weird facts you don't know. 
-A swarm of 20,000 bees followed a car for two days because their queen was stuck inside.
-Rockados cannot stick their tongue out because it's attached to the roof of their mouths. 
 
-If you tickle a rat day after day, it will start laughing whenever it sees you. 
-
-In 2013, police and the Maldives arrested a coconut for lordering near a polling station for the presidential election.
-Locals fear the coconut may have been ingrained with a black magic spell to influence the election. 
-
-A Chinese farmer who always wanted to own his own plane built a full scale,
-non-working replica of an airbus A320 out of 50 tons of steel. It took him and his friends over two years and costed over $400,000. 
-
-When invited by a lady to spend a night with her, Benjamin Franklin asked to postpone until winter when nights were longer.`.replace(
-  /\r\n|\n|\r/g,
-  ""
-);
 const FILE_AUDIO = `script.mp3`;
 const FILE_SUB_VTT = `script.vtt`;
 const FILE_SUB_JSON = `script.json`;
 
-const PATH_AUDIO = path.join(FOLDER_TEMP, FILE_AUDIO);
-const PATH_SUB_VTT = path.join(FOLDER_TEMP, FILE_SUB_VTT);
-const PATH_SUB_JSON = path.join(FOLDER_TEMP, FILE_SUB_JSON);
-
-console.log({
-  VOICE,
-  PATH_AUDIO,
-});
+const PATH_AUDIO = path.join(FOLDER_PUBLIC, FILE_AUDIO);
+const PATH_SUB_VTT = path.join(FOLDER_PUBLIC, FILE_SUB_VTT);
+const PATH_SUB_JSON = path.join(FOLDER_PUBLIC, FILE_SUB_JSON);
 
 try {
   await exec(
@@ -64,14 +49,14 @@ const subtitleString = await fsPromises
 
 const { entries } = vtt.parse(subtitleString);
 
-const transformedSub = entries.map((entry) => ({
-  ...entry,
-  text: entry.text.replaceAll("\r", ""),
-}));
+const transformedSub = entries.map(({ id, ...entry }) => {
+  return {
+    ...entry,
+    text: entry.text.replaceAll("\r", ""),
+  };
+});
 
 await fsPromises.writeFile(
   PATH_SUB_JSON,
   JSON.stringify({ subtitles: transformedSub })
 );
-
-console.log((await fsPromises.readFile(PATH_SUB_JSON)).toString());

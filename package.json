@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "studio": "remotion studio ./src/remotion/index.ts",
-    "render": "remotion render ./src/remotion/index.ts Sludge ./temp/rendered.mp4",
+    "render": "remotion render ./src/remotion/index.ts Sludge ./out/rendered.mp4",
     "start": "vite-node ./src/index.ts",
     "test": "vite-node ./src/test.ts"
   },
