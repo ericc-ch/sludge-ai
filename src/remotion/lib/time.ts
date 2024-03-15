@@ -1,9 +1,6 @@
 import { FPS } from "./constants";
 
-export const msToSeconds = (ms: number) => {
-  return Math.floor(ms / 1000);
-};
-
+// Not rounding here because it will be too inaccurate
 export const msToFrames = (ms: number) => {
-  return msToSeconds(ms) * FPS;
+  return ms * (FPS / 1000);
 };

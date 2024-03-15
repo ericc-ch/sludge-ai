@@ -14,7 +14,7 @@ Config.overrideWebpackConfig((config) => {
       ...config.resolve,
       alias: {
         ...(config.resolve?.alias ?? {}),
-        "@": path.join(process.cwd()),
+        "~": path.join(process.cwd()),
       },
     },
   };

@@ -8,7 +8,7 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "~/*": ["./*"]
     }
   },
   "exclude": ["node_modules"]
