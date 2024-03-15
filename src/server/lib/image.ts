@@ -1,9 +1,10 @@
+import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 import path from "node:path";
 import { ofetch } from "ofetch";
-import { DOWNLOAD_PATH } from "../paths";
+import { z } from "zod";
+import { DOWNLOAD_PATH, PATH_IMAGES_JSON } from "../paths";
 import { ResponseSearch } from "../types";
-import fs from "node:fs";
 
 export const saveImage = async (url: string, name: string) => {
   const response = await ofetch<Blob>(url);
@@ -16,13 +17,17 @@ export const saveImage = async (url: string, name: string) => {
   );
 };
 
-interface Image {
-  from: number;
-  to: number;
-  search: string;
-}
+export const IMAGES_SCHEMA = z.array(
+  z.object({
+    from: z.number(),
+    to: z.number(),
+    search: z.string(),
+  })
+);
 
-export const downloadImages = async (images: Array<Image>) => {
+export type Images = z.infer<typeof IMAGES_SCHEMA>;
+
+export const downloadImages = async (images: Images) => {
   for (const { search } of images) {
     const searchParams = new URLSearchParams({
       query: search,
@@ -45,4 +50,8 @@ export const downloadImages = async (images: Array<Image>) => {
       await saveImage(photoSrc, search);
     }
   }
+};
+
+export const writeImagesJSON = (images: Images) => {
+  return fsPromises.writeFile(PATH_IMAGES_JSON, JSON.stringify(images));
 };
