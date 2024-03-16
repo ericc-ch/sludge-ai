@@ -14,7 +14,7 @@ import { textToSpeech } from "./server/lib/tts";
 
 await initializeFolders();
 
-const keyword = await input({ message: "Enter the story keyword: " });
+const keyword = await input({ message: "Enter the story keyword:" });
 
 const title = await generateTitle(keyword);
 console.log(`Title: ${title}`);
@@ -22,8 +22,10 @@ console.log(`Title: ${title}`);
 const story = await generateStory(title);
 console.log(`Story: ${story.slice(0, 200)}...`);
 
+console.log(`Generating audio...`);
 try {
   await textToSpeech(story);
+  console.log(`Audio generated!`);
 } catch (error) {
   console.error(error);
   process.exitCode = 1;
