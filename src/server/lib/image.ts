@@ -31,6 +31,8 @@ export const downloadImages = async (images: Images) => {
   for (const { search } of images) {
     const searchParams = new URLSearchParams({
       query: search,
+      // Pexels API uses snake_case
+      // eslint-disable-next-line camelcase
       per_page: "1",
     });
 

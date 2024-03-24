@@ -1,4 +1,4 @@
-import { input } from "@inquirer/prompts";
+import { input, confirm } from "@inquirer/prompts";
 import { generateImages } from "./server/ai/generation/image-search";
 import { generateStory } from "./server/ai/generation/story";
 import { generateTitle } from "./server/ai/generation/title";
@@ -16,11 +16,28 @@ await initializeFolders();
 
 const keyword = await input({ message: "Enter the story keyword:" });
 
-const title = await generateTitle(keyword);
-console.log(`Title: ${title}`);
+let title = "";
+while (
+  !title ||
+  (await confirm({ message: "Regenerate title?", default: true }))
+) {
+  console.log(`Generating title...`);
+  title = await generateTitle(keyword);
+  console.log(`Title: ${title}`);
+  console.log(`---`);
+}
 
-const story = await generateStory(title);
-console.log(`Story: ${story.slice(0, 200)}...`);
+let story = "";
+
+while (
+  !story ||
+  (await confirm({ message: "Regenerate story?", default: true }))
+) {
+  console.log(`Generating story...`);
+  story = await generateStory(title);
+  console.log(`Story: ${story}`);
+  console.log(`---`);
+}
 
 console.log(`Generating audio...`);
 try {
