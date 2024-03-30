@@ -4,7 +4,7 @@ import path from "node:path";
 import { ofetch } from "ofetch";
 import { z } from "zod";
 import { DOWNLOAD_PATH, PATH_IMAGES_JSON } from "../paths";
-import { ResponseSearch } from "../types";
+import type { ResponseSearch } from "../types";
 
 export const saveImage = async (url: string, name: string) => {
   const response = await ofetch<Blob>(url);

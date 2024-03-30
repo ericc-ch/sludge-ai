@@ -1,12 +1,12 @@
-import { input, confirm } from "@inquirer/prompts";
+import { confirm, input } from "@inquirer/prompts";
 import { generateImages } from "./server/ai/generation/image-search";
 import { generateStory } from "./server/ai/generation/story";
 import { generateTitle } from "./server/ai/generation/title";
 import {
   IMAGES_SCHEMA,
-  Images,
   downloadImages,
   writeImagesJSON,
+  type Images,
 } from "./server/lib/image";
 import { initializeFolders } from "./server/lib/init";
 import { getSubtitlesJSON, writeSubtitlesJSON } from "./server/lib/subtitles";

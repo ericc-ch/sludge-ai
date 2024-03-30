@@ -1,4 +1,3 @@
-import { execa } from "execa";
 import { PATH_AUDIO, PATH_SUB_VTT } from "../paths";
 
 const VOICE = `en-US-AvaNeural`;
@@ -20,7 +19,8 @@ const sanitize = (str: string) => {
 export const textToSpeech = async (text: string) => {
   const SCRIPT = sanitize(text);
 
-  return execa("edge-tts", [
+  return Bun.spawnSync([
+    "edge-tts",
     "-v",
     VOICE,
     "-t",

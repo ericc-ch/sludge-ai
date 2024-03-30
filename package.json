@@ -7,7 +7,7 @@
   "scripts": {
     "studio": "remotion studio ./src/remotion/index.ts",
     "render": "remotion render ./src/remotion/index.ts Sludge ./out/rendered.mp4",
-    "start": "vite-node ./src/index.ts"
+    "start": "bun ./src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,9 +18,7 @@
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.69",
     "eslint": "^8.57.0",
-    "typescript": "^5.4.3",
-    "vite-node": "^1.4.0",
-    "vite-tsconfig-paths": "^4.3.2"
+    "typescript": "^5.4.3"
   },
   "dependencies": {
     "@fontsource-variable/dynapuff": "^5.0.19",

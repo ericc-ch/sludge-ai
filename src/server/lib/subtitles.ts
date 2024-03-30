@@ -12,6 +12,7 @@ export const getSubtitlesJSON = async () => {
 
   const { entries } = vtt.parse(subtitleString);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const transformedSub = entries.map(({ id: _, ...entry }) => {
     return {
       ...entry,
