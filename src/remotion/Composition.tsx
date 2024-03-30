@@ -6,7 +6,7 @@ import {
   Sequence,
   staticFile,
 } from "remotion";
-import { IMAGES, SUBTITLES } from "./assets/json-files";
+import { CONFIG, IMAGES, SUBTITLES } from "./assets/json-files";
 import { Text } from "./components/Text";
 import { msToFrames } from "./lib/time";
 
@@ -23,7 +23,7 @@ export const MyComposition = () => {
           }}
           volume={1}
           startFrom={90}
-          src={staticFile("/bg-video/steep.mp4")}
+          src={staticFile(`/bg-video/${CONFIG.video}`)}
         />
       </AbsoluteFill>
 
