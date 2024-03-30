@@ -1,7 +1,7 @@
 import path from "node:path";
 import { ofetch } from "ofetch";
 import { z } from "zod";
-import { DOWNLOAD_PATH, PATH_IMAGES_JSON } from "../paths";
+import { FOLDER_DOWNLOAD } from "../paths";
 import type { ResponseSearch } from "../types";
 import { chunk } from "./array";
 
@@ -16,7 +16,7 @@ export const IMAGES_SCHEMA = z.array(
 export type Images = z.infer<typeof IMAGES_SCHEMA>;
 
 const downloadImageFile = async (url: string, name: string) => {
-  const filePath = path.join(DOWNLOAD_PATH, `${name}.jpg`);
+  const filePath = path.join(FOLDER_DOWNLOAD, `${name}.jpg`);
   const response = await ofetch<Blob>(url);
   return Bun.write(filePath, response);
 };
@@ -48,8 +48,4 @@ export const fetchAllImages = async (images: Images) => {
   for (const chunk of chunks) {
     await Promise.all(chunk.map(fetchImage));
   }
-};
-
-export const writeImagesJSON = (images: Images) => {
-  return Bun.write(PATH_IMAGES_JSON, JSON.stringify(images));
 };

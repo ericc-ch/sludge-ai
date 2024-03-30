@@ -1,20 +1,36 @@
-import { confirm, input } from "@inquirer/prompts";
+import { confirm, input, select } from "@inquirer/prompts";
+import fs from "node:fs/promises";
 import {
   generateImages,
   generateStory,
   generateTitle,
 } from "./server/ai/generation";
-import {
-  IMAGES_SCHEMA,
-  fetchAllImages,
-  writeImagesJSON,
-  type Images,
-} from "./server/lib/image";
+import { IMAGES_SCHEMA, fetchAllImages, type Images } from "./server/lib/image";
 import { initializeFolders } from "./server/lib/init";
-import { getSubtitlesJSON, writeSubtitlesJSON } from "./server/lib/subtitles";
+import { writeJSON } from "./server/lib/json";
+import { getSubtitles } from "./server/lib/subtitles";
 import { textToSpeech } from "./server/lib/tts";
+import {
+  FOLDER_BG_VIDEOS,
+  PATH_CONFIG_JSON,
+  PATH_IMAGES_JSON,
+  PATH_SUB_JSON,
+} from "./server/paths";
 
 await initializeFolders();
+
+const availableVideos = await fs.readdir(FOLDER_BG_VIDEOS);
+const video = await select({
+  message: "Select a background video",
+  choices: availableVideos.map((video) => ({
+    name: video,
+    value: video,
+  })),
+});
+
+const config = {
+  video,
+};
 
 const keyword = await input({ message: "Enter the story keyword:" });
 
@@ -50,8 +66,8 @@ try {
   process.exitCode = 1;
 }
 
-const subtitlesJSON = await getSubtitlesJSON();
-const images = await generateImages(subtitlesJSON);
+const subtitles = await getSubtitles();
+const images = await generateImages(JSON.stringify(subtitles));
 
 let parsedImages: Images = [];
 
@@ -62,6 +78,7 @@ try {
   console.error(error);
 }
 
-await writeSubtitlesJSON(subtitlesJSON);
-await writeImagesJSON(parsedImages);
+await writeJSON(PATH_SUB_JSON, subtitles);
+await writeJSON(PATH_IMAGES_JSON, parsedImages);
+await writeJSON(PATH_CONFIG_JSON, config);
 await fetchAllImages(parsedImages);
