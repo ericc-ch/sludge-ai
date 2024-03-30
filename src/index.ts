@@ -16,6 +16,9 @@ import {
   PATH_IMAGES_JSON,
   PATH_SUB_JSON,
 } from "./server/paths";
+import ora from "ora";
+
+const spinner = ora();
 
 await initializeFolders();
 
@@ -39,10 +42,10 @@ while (
   !title ||
   (await confirm({ message: "Regenerate title?", default: true }))
 ) {
-  console.log(`Generating title...`);
+  spinner.start(`Generating title...`);
   title = await generateTitle(keyword);
+  spinner.stop();
   console.log(`Title: ${title}`);
-  console.log(`---`);
 }
 
 let story = "";
@@ -51,15 +54,16 @@ while (
   !story ||
   (await confirm({ message: "Regenerate story?", default: true }))
 ) {
-  console.log(`Generating story...`);
+  spinner.start(`Generating story...`);
   story = await generateStory(title);
+  spinner.stop();
   console.log(`Story: ${story}`);
-  console.log(`---`);
 }
 
-console.log(`Generating audio...`);
+spinner.start(`Generating audio...`);
 try {
   await textToSpeech(story);
+  spinner.stop();
   console.log(`Audio generated!`);
 } catch (error) {
   console.error(error);
