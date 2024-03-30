@@ -35,7 +35,7 @@ const fetchImage = async (search: string) => {
 
   const res = await ofetch<ResponseSearch>(
     `https://api.pexels.com/v1/search?${searchParams.toString()}`,
-    { headers: { Authorization: `${import.meta.env.VITE_PEXELS_API_KEY}` } }
+    { headers: { Authorization: `${import.meta.env.API_KEY_PEXELS}` } }
   );
 
   const photoSrc = res.photos[0].src.large;
