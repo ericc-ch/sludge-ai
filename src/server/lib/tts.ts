@@ -1,33 +1,26 @@
 import { PATH_AUDIO, PATH_SUB_VTT } from "../paths";
 
 const VOICE = `en-US-AvaNeural`;
-
-const sanitize = (str: string) => {
-  return str.replace(/[\\"\r\n]/g, (match) => {
-    switch (match) {
-      case '"':
-        return '\\"';
-      case "\r":
-      case "\n":
-        return "\\n";
-      default:
-        return `\\${match}`;
-    }
-  });
-};
+const EXECUTABLES = ["edge-tts", "edge-tts.exe"];
 
 export const textToSpeech = async (text: string) => {
-  const SCRIPT = sanitize(text);
-
-  return Bun.spawnSync([
-    "edge-tts",
-    "-v",
-    VOICE,
-    "-t",
-    SCRIPT,
-    "--write-media",
-    PATH_AUDIO,
-    "--write-subtitles",
-    PATH_SUB_VTT,
-  ]);
+  EXECUTABLES.forEach((executable, index) => {
+    try {
+      return Bun.spawnSync([
+        executable,
+        "-v",
+        VOICE,
+        "-t",
+        text,
+        "--write-media",
+        PATH_AUDIO,
+        "--write-subtitles",
+        PATH_SUB_VTT,
+      ]);
+    } catch (error) {
+      if (index === EXECUTABLES.length - 1) {
+        throw error;
+      }
+    }
+  });
 };
