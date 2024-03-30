@@ -1,10 +1,12 @@
 import { confirm, input } from "@inquirer/prompts";
-import { generateImages } from "./server/ai/generation/image-search";
-import { generateStory } from "./server/ai/generation/story";
-import { generateTitle } from "./server/ai/generation/title";
+import {
+  generateImages,
+  generateStory,
+  generateTitle,
+} from "./server/ai/generation";
 import {
   IMAGES_SCHEMA,
-  downloadImages,
+  fetchAllImages,
   writeImagesJSON,
   type Images,
 } from "./server/lib/image";
@@ -62,4 +64,4 @@ try {
 
 await writeSubtitlesJSON(subtitlesJSON);
 await writeImagesJSON(parsedImages);
-await downloadImages(parsedImages);
+await fetchAllImages(parsedImages);

@@ -1,10 +1,9 @@
 import vtt from "@plussub/srt-vtt-parser";
-import fsPromises from "node:fs/promises";
 import { PATH_SUB_JSON, PATH_SUB_VTT } from "../paths";
 
 const getRawSubtitles = async () => {
-  const data = await fsPromises.readFile(PATH_SUB_VTT);
-  return data.toString();
+  const file = Bun.file(PATH_SUB_VTT);
+  return file.text();
 };
 
 export const getSubtitlesJSON = async () => {
@@ -24,5 +23,5 @@ export const getSubtitlesJSON = async () => {
 };
 
 export const writeSubtitlesJSON = (subtitlesJSON: string) => {
-  return fsPromises.writeFile(PATH_SUB_JSON, subtitlesJSON);
+  return Bun.write(PATH_SUB_JSON, subtitlesJSON);
 };

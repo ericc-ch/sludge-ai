@@ -1,21 +1,9 @@
-import fs from "node:fs";
-import fsPromises from "node:fs/promises";
 import path from "node:path";
 import { ofetch } from "ofetch";
 import { z } from "zod";
 import { DOWNLOAD_PATH, PATH_IMAGES_JSON } from "../paths";
 import type { ResponseSearch } from "../types";
-
-export const saveImage = async (url: string, name: string) => {
-  const response = await ofetch<Blob>(url);
-  const buffer = await response.arrayBuffer();
-
-  return fsPromises.writeFile(
-    path.join(DOWNLOAD_PATH, `${name}.jpg`),
-    Buffer.from(buffer),
-    "binary"
-  );
-};
+import { chunk } from "./array";
 
 export const IMAGES_SCHEMA = z.array(
   z.object({
@@ -27,33 +15,41 @@ export const IMAGES_SCHEMA = z.array(
 
 export type Images = z.infer<typeof IMAGES_SCHEMA>;
 
-export const downloadImages = async (images: Images) => {
-  for (const { search } of images) {
-    const searchParams = new URLSearchParams({
-      query: search,
-      // Pexels API uses snake_case
-      // eslint-disable-next-line camelcase
-      per_page: "1",
-    });
+const downloadImageFile = async (url: string, name: string) => {
+  const filePath = path.join(DOWNLOAD_PATH, `${name}.jpg`);
+  const response = await ofetch<Blob>(url);
+  return Bun.write(filePath, response);
+};
 
-    const res = await ofetch<ResponseSearch>(
-      `https://api.pexels.com/v1/search?${searchParams.toString()}`,
-      { headers: { Authorization: `${import.meta.env.VITE_PEXELS_API_KEY}` } }
-    );
+const getUniqueImage = (images: Images) =>
+  Array.from(new Set(images.map(({ search }) => search)));
 
-    const photoSrc = res.photos[0].src.large;
+const fetchImage = async (search: string) => {
+  console.log(`Fetching image: ${search}`);
+  const searchParams = new URLSearchParams({
+    query: search,
+    // Pexels API uses snake_case
+    // eslint-disable-next-line camelcase
+    per_page: "1",
+  });
 
-    const fileExists = fs.existsSync(path.join(DOWNLOAD_PATH, `${search}.jpg`));
+  const res = await ofetch<ResponseSearch>(
+    `https://api.pexels.com/v1/search?${searchParams.toString()}`,
+    { headers: { Authorization: `${import.meta.env.VITE_PEXELS_API_KEY}` } }
+  );
 
-    if (fileExists) {
-      console.log(`Skipping ${search}...`);
-    } else {
-      console.log(`Downloading ${search}...`);
-      await saveImage(photoSrc, search);
-    }
+  const photoSrc = res.photos[0].src.large;
+  return downloadImageFile(photoSrc, search);
+};
+
+export const fetchAllImages = async (images: Images) => {
+  const chunks = chunk(getUniqueImage(images), 4);
+
+  for (const chunk of chunks) {
+    await Promise.all(chunk.map(fetchImage));
   }
 };
 
 export const writeImagesJSON = (images: Images) => {
-  return fsPromises.writeFile(PATH_IMAGES_JSON, JSON.stringify(images));
+  return Bun.write(PATH_IMAGES_JSON, JSON.stringify(images));
 };
