@@ -1,7 +1,7 @@
 import { PATH_AUDIO, PATH_SUB_VTT } from "../paths";
 
 const VOICE = `en-US-AvaNeural`;
-const EXECUTABLES = ["edge-tts", "edge-tts.exe"];
+const EXECUTABLES = ["edge-tts", "~/.local/bin/edge-tts", "edge-tts.exe"];
 
 export const textToSpeech = async (text: string) => {
   EXECUTABLES.forEach((executable, index) => {
