@@ -9,7 +9,7 @@ import { IMAGES_SCHEMA, fetchAllImages, type Images } from "./server/lib/image";
 import { initializeFolders } from "./server/lib/init";
 import { writeJSON } from "./server/lib/json";
 import { getSubtitles } from "./server/lib/subtitles";
-import { textToSpeech } from "./server/lib/tts";
+import { textToSpeech, textToSpeechAlt } from "./server/lib/tts";
 import {
   FOLDER_BG_VIDEOS,
   PATH_CONFIG_JSON,
@@ -62,7 +62,9 @@ while (
 
 spinner.start(`Generating audio...`);
 try {
-  await textToSpeech(story);
+  await (process.env.IS_GOOGLE_COLAB
+    ? textToSpeechAlt(story)
+    : textToSpeech(story));
   spinner.stop();
   console.log(`Audio generated!`);
 } catch (error) {

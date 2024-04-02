@@ -29,3 +29,8 @@ export const textToSpeech = async (text: string) => {
     }
   });
 };
+
+export const textToSpeechAlt = (text: string) =>
+  Bun.$`cd ${cwd} && ${{
+    raw: "./edge-tts",
+  }} -v ${VOICE} -t ${text} --write-media ${PATH_AUDIO} --write-subtitles ${PATH_SUB_VTT}`;
